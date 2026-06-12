@@ -356,9 +356,14 @@ function die() {
 
 function gameOver() {
    let name = prompt("Enter your name:");
-  if (name) {
-    sendScore(name, score);
-  }
+
+if (name) {
+  sendScore(name, score);
+
+  setTimeout(() => {
+    showRank(name, score);
+  }, 1000);
+}
   clearInterval(interval);
   gameState = 'gameover';
   highscores.push(score);
@@ -368,6 +373,26 @@ function gameOver() {
   hiScore = highscores[0]||0;
   showOverlay('GAME OVER', `Score: ${score}\nPress OK to retry`);
   updateHUD();
+}
+async function showRank(name, myScore) {
+  const data = await getLeaderboard();
+
+  // TOP 7
+  const top7 = data.slice(0, 7);
+
+  console.log("🏆 TOP 7:");
+  top7.forEach((p, i) => {
+    console.log(`#${i + 1} ${p.name} - ${p.score}`);
+  });
+
+  // 👤 pronađi poziciju igrača
+  let position = data.findIndex(p => p.name === name && p.score === myScore);
+
+  if (position === -1) {
+    console.log("Player not found");
+  } else {
+    console.log(`\n👤 YOU ARE #${position + 1} - ${name} (${myScore})`);
+  }
 }
 
 function draw() {
