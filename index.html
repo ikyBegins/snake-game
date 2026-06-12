@@ -249,6 +249,35 @@
 </div>
 
 <script>
+const SUPABASE_URL = "https://kbwqufuxrrgcfntybakr.supabase.co";
+const SUPABASE_KEY = "sb_publishable_ysqDaIdA0TxEc-QDnDFrSw_OYkhjkH7";
+async function sendScore(name, score) {
+  await fetch(SUPABASE_URL + "/rest/v1/scores", {
+    method: "POST",
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": "Bearer " + SUPABASE_KEY,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      name: name,
+      score: score
+    })
+  });
+}
+async function getLeaderboard() {
+  const res = await fetch(
+    SUPABASE_URL + "/rest/v1/scores?select=*&order=score.desc&limit=10",
+    {
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY
+      }
+    }
+  );
+
+  return await res.json();
+}
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -326,6 +355,10 @@ function die() {
 }
 
 function gameOver() {
+   let name = prompt("Enter your name:");
+  if (name) {
+    sendScore(name, score);
+  }
   clearInterval(interval);
   gameState = 'gameover';
   highscores.push(score);
